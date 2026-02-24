@@ -1,67 +1,118 @@
-/** MAIN CLASS - UseCase11PalindromeCheckerApp
+/** MAIN CLASS - UseCase13PalindromeCheckerApp
 
- Use Case 11: Object-Oriented Palindrome Checker with Encapsulation
+ Use Case 13: Performance Comparison of Palindrome Algorithms
 
  Description:
- Encapsulates the palindrome checking logic within a dedicated class.
- The class exposes a single public method checkPalindrome() for validation.
- This demonstrates encapsulation and the Single Responsibility Principle.
+ This class compares the execution time of different palindrome checking algorithms
+ (Stack, Deque, Recursive) using System.nanoTime().
+ It demonstrates algorithm performance analysis in Java.
 
  Key Concepts:
- - Encapsulation (private fields, public methods)
- - Single Responsibility Principle
- - Internal data structures (Stack / Array)
- - Reusable and modular code
+ - System.nanoTime() for precise timing
+ - Algorithm performance comparison
+ - Strategy pattern for modular algorithms
+ - Case-insensitive & space-ignored checking
 
- @author Vihan Tiwari
- @version 11.0
+ @author Sourav Kumar
+ @version 13.0
  **/
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Stack;
 
-public class PalindromeCheckerApp {
+// Strategy interface
+interface PalindromeStrategy {
+    boolean check(String text);
+}
 
-    // Private field to store the text
-    private String text;
-
-    // Constructor
-    public PalindromeCheckerApp(String text) {
-        this.text = text;
-    }
-
-    // Public method to check palindrome
-    public boolean checkPalindrome() {
-        if (text == null || text.isEmpty()) return true;
-
-        // Normalize text: remove spaces and convert to lowercase
+// Stack-based implementation
+class StackStrategy implements PalindromeStrategy {
+    @Override
+    public boolean check(String text) {
         String cleaned = text.replaceAll("\\s+", "").toLowerCase();
-
-        // Use internal Stack for LIFO comparison
         Stack<Character> stack = new Stack<>();
+        for (char ch : cleaned.toCharArray()) stack.push(ch);
         for (char ch : cleaned.toCharArray()) {
-            stack.push(ch);
-        }
-
-        for (char ch : cleaned.toCharArray()) {
-            if (stack.pop() != ch) {
-                return false;
-            }
+            if (stack.pop() != ch) return false;
         }
         return true;
     }
+}
 
-    // Optional: getter for the text
-    public String getText() {
-        return text;
+// Deque-based implementation
+class DequeStrategy implements PalindromeStrategy {
+    @Override
+    public boolean check(String text) {
+        String cleaned = text.replaceAll("\\s+", "").toLowerCase();
+        Deque<Character> deque = new LinkedList<>();
+        for (char ch : cleaned.toCharArray()) deque.addLast(ch);
+        while (deque.size() > 1) {
+            if (!deque.removeFirst().equals(deque.removeLast())) return false;
+        }
+        return true;
+    }
+}
+
+// Recursive implementation
+class RecursiveStrategy implements PalindromeStrategy {
+
+    private boolean isPalindromeRecursive(String text, int start, int end) {
+        if (start >= end) return true;
+        if (text.charAt(start) != text.charAt(end)) return false;
+        return isPalindromeRecursive(text, start + 1, end - 1);
     }
 
+    @Override
+    public boolean check(String text) {
+        String cleaned = text.replaceAll("\\s+", "").toLowerCase();
+        return isPalindromeRecursive(cleaned, 0, cleaned.length() - 1);
+    }
+}
+
+// Context class
+class PalindromeCheckerClass {
+    private PalindromeStrategy strategy;
+
+    public PalindromeCheckerClass(PalindromeStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public void setStrategy(PalindromeStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public boolean checkPalindrome(String text) {
+        return strategy.check(text);
+    }
+
+    // Method to measure execution time
+    public long measureExecutionTime(String text) {
+        long start = System.nanoTime();
+        checkPalindrome(text);
+        long end = System.nanoTime();
+        return end - start; // nanoseconds
+    }
+}
+
+// Demo
+public class PalindromeCheckerApp {
     public static void main(String[] args) {
         String input = "A man a plan a canal Panama";
 
-        PalindromeChecker checker = new PalindromeChecker(input);
-        boolean result = checker.checkPalindrome();
+        PalindromeCheckerClass checker = new PalindromeCheckerClass(new StackStrategy());
+        long stackTime = checker.measureExecutionTime(input);
+        System.out.println("StackStrategy result: " + checker.checkPalindrome(input) +
+                " | Execution time: " + stackTime + " ns");
 
-        System.out.println("Input text : " + checker.getText());
-        System.out.println("Is it Palindrome ? : " + result);
+        checker.setStrategy(new DequeStrategy());
+        long dequeTime = checker.measureExecutionTime(input);
+        System.out.println("DequeStrategy result: " + checker.checkPalindrome(input) +
+                " | Execution time: " + dequeTime + " ns");
+
+        checker.setStrategy(new RecursiveStrategy());
+        long recursiveTime = checker.measureExecutionTime(input);
+        System.out.println("RecursiveStrategy result: " + checker.checkPalindrome(input) +
+                " | Execution time: " + recursiveTime + " ns");
     }
 }
