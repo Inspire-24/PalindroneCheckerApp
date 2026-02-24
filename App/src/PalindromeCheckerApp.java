@@ -25,7 +25,7 @@ public class PalindromeCheckerApp {
     private String text;
 
     // Constructor
-    public PalindromeChecker(String text) {
+    public PalindromeCheckerApp(String text) {
         this.text = text;
     }
 
