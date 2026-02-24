@@ -1,51 +1,44 @@
-/** MAIN CLASS - UseCase7PalindromeCheckerApp
+/**
+ MAIN CLASS - UseCase3PalindromeCheckerUsingReverse
 
- Use Case 7: Deque Based Optimized Palindrome Checker
+ Use Case 3: Reverse String Based Palindrome Check
 
  Description:
- This class validates a palindrome using a Deque
- (Double Ended Queue).
- Characters are inserted into the deque and then compared by removing elements from both ends:
- - removeFirst()
- - removeLast()
+ This class checks whether a string is a palindrome
+ by reversing the string and comparing it with
+ the original value.
 
- This avoids reversing the string and provides an efficient front-to-back comparison approach.
+ At this stage, the application:
+ Iterates the string in reverse order
+ Builds a reversed version
+ Compares original and reversed strings
+ Displays the validation result
 
- This use case demonstrates optimal bidirectional traversal using Deque.
+ This introduces transformation-based validation.
+
  @author Vihan Tiwari
- @version 7.0
+ @version 3.0
  **/
 
-import java.util.Deque;
-import java.util.LinkedList;
-
+import java.util.*;
 public class PalindromeCheckerApp {
-
     public static boolean isPalindrome(String text) {
-
         // Remove spaces and convert to lowercase
         String cleaned = text.replaceAll("\\s+", "").toLowerCase();
 
-        // Use Deque to store characters
-        Deque<Character> deque = new LinkedList<>();
-
-        // Insert characters into deque
-        for (char ch : cleaned.toCharArray()) {
-            deque.addLast(ch); // Insert at the rear
+        // Reverse the string using a loop
+        String reversed = "";
+        for (int i = cleaned.length() - 1; i >= 0; i--) {
+            reversed += cleaned.charAt(i); // Concatenate characters
         }
 
-        // Compare front and rear elements until deque is empty or mismatch found
-        while (deque.size() > 1) {
-            if (!deque.removeFirst().equals(deque.removeLast())) {
-                return false; // Mismatch found
-            }
-        }
-
-        return true; // All matched
+        // Compare original cleaned string with reversed string
+        return cleaned.equals(reversed);
     }
 
     public static void main(String[] args) {
 
+        // Hardcoded test string (can be changed)
         String input = "Madam";
 
         boolean result = isPalindrome(input);
